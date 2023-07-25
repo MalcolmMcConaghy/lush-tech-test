@@ -6,6 +6,7 @@ export interface FetchProductResponse {
       node: {
         id: number;
         name: string;
+        description: string;
         pricing: {
           priceRangeUndiscounted: {
             start: {
@@ -32,6 +33,7 @@ export const fetchProduct = (id: string) => gql`
         node {
           id
           name
+          description
           pricing {
             priceRangeUndiscounted {
               start {
