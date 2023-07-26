@@ -2,6 +2,12 @@ import { gql } from "@apollo/client";
 
 export interface FetchProductsResponse {
   products: {
+    pageInfo: {
+      hasNextPage: boolean;
+      hasPreviousPage: boolean;
+      startCursor: string;
+      endCursor: string;
+    };
     edges: {
       node: {
         id: number;
@@ -26,8 +32,25 @@ export interface FetchProductsResponse {
 }
 
 export const fetchProducts = gql`
-  query {
-    products(channel: "uk", first: 20) {
+  query fetchProducts(
+    $first: Int
+    $last: Int
+    $before: String
+    $after: String
+  ) {
+    products(
+      channel: "uk"
+      first: $first
+      last: $last
+      before: $before
+      after: $after
+    ) {
+      pageInfo {
+        hasNextPage
+        hasPreviousPage
+        startCursor
+        endCursor
+      }
       edges {
         node {
           id

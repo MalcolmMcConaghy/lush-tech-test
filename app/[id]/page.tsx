@@ -3,16 +3,21 @@ import { getClient } from "@/lib/client";
 import { fetchProduct, FetchProductResponse } from "@/queries/fetchProduct";
 import Image from "next/image";
 
+interface Block {
+  id: string;
+  data: {
+    text: string;
+  };
+}
+
 export default async function Product({ params }: { params: { id: string } }) {
   const { data } = await getClient().query<FetchProductResponse>({
-    query: fetchProduct(params.id),
+    query: fetchProduct(decodeURIComponent(params.id)),
   });
 
   const { id, name, media, description, pricing } = data.products.edges[0].node;
 
-  const descriptionBlocks = JSON.parse(description).blocks;
-
-  console.log(descriptionBlocks);
+  const descriptionBlocks = JSON.parse(description)?.blocks ?? [];
 
   return (
     <>
@@ -41,7 +46,7 @@ export default async function Product({ params }: { params: { id: string } }) {
               currency: pricing.priceRangeUndiscounted.start.currency,
             }).format(pricing.priceRangeUndiscounted.start.gross.amount)}
           </div>
-          {descriptionBlocks.map((block) => {
+          {descriptionBlocks.map((block: Block) => {
             const { id, data } = block;
 
             return (
