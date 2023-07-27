@@ -6,12 +6,24 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import Image from "next/image";
 import Link from "next/link";
 import { useQuery } from "@apollo/client";
+import { Input } from "@/components/ui/input";
+import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [search, setSearch] = useState("");
   const { data, loading, error, fetchMore } = useQuery<FetchProductsResponse>(
     fetchProducts,
     { variables: { first: 16, last: null, before: null, after: null } }
   );
+
+  useEffect(() => {
+    fetchMore({
+      variables: { search: search },
+      updateQuery: (previousQueryResult, { fetchMoreResult }) => {
+        return fetchMoreResult;
+      },
+    });
+  }, [search]);
 
   if (loading) return <div>Loading...</div>;
 
@@ -25,10 +37,16 @@ export default function Home() {
     );
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-6 lg:p-24">
+    <main className="flex min-h-screen flex-col items-center justify-between p-6 max-w-[800px] m-auto">
       <div className="flex flex-col space-y-4 items-center">
         <div className="text-2xl font-semibold">Products</div>
-        <div className="grid grid-cols-2 gap-4">
+        <Input
+          type="text"
+          placeholder="Search name"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {data.products.edges.map((product) => {
             const { id, name, thumbnail, pricing } = product.node;
             if (!thumbnail?.url) return;

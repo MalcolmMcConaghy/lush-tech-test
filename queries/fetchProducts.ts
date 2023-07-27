@@ -37,6 +37,7 @@ export const fetchProducts = gql`
     $last: Int
     $before: String
     $after: String
+    $search: String
   ) {
     products(
       channel: "uk"
@@ -44,6 +45,7 @@ export const fetchProducts = gql`
       last: $last
       before: $before
       after: $after
+      filter: { search: $search }
     ) {
       pageInfo {
         hasNextPage

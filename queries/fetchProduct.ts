@@ -17,6 +17,7 @@ export interface FetchProductResponse {
             };
           };
         };
+        rating: number;
         media: {
           url: string;
           alt: string;
@@ -44,6 +45,7 @@ export const fetchProduct = (id: string) => gql`
               }
             }
           }
+          rating
           media {
             url
             alt
