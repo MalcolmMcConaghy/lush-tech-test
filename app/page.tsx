@@ -8,31 +8,49 @@ import Link from "next/link";
 import { useQuery } from "@apollo/client";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
+import useDebounce from "@/lib/useDebounce";
 
 export default function Home() {
   const [search, setSearch] = useState("");
+  const debouncedSearch = useDebounce(search, 500);
   const { data, loading, error, fetchMore } = useQuery<FetchProductsResponse>(
     fetchProducts,
-    { variables: { first: 16, last: null, before: null, after: null } }
+    {
+      variables: {
+        first: 16,
+        last: null,
+        before: null,
+        after: null,
+        search: "",
+      },
+    }
   );
 
   useEffect(() => {
     fetchMore({
-      variables: { search: search },
+      variables: { search: debouncedSearch },
       updateQuery: (previousQueryResult, { fetchMoreResult }) => {
         return fetchMoreResult;
       },
     });
-  }, [search]);
+  }, [debouncedSearch]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading)
+    return (
+      <div className="text-2xl font-semibold text-center mt-4">Loading...</div>
+    );
 
-  if (error) return <div>{error.message}</div>;
+  if (error)
+    return (
+      <div className="text-2xl font-semibold text-center mt-4">
+        {error.message}
+      </div>
+    );
 
   if (!data)
     return (
-      <div className="text-2xl font-semibold text-center">
-        No Products Found
+      <div className="text-2xl font-semibold text-center mt-4">
+        No products found
       </div>
     );
 
@@ -46,36 +64,44 @@ export default function Home() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {data.products.edges.map((product) => {
-            const { id, name, thumbnail, pricing } = product.node;
-            if (!thumbnail?.url) return;
-            return (
-              <Link key={id} href={`/${id}`}>
-                <Card className="p-4">
-                  <div className="flex justify-center items-center mb-2">
-                    <Image
-                      width={100}
-                      height={100}
-                      src={thumbnail?.url ?? ""}
-                      alt={thumbnail?.alt ?? ""}
-                    />
-                  </div>
-                  <CardTitle className="text-sm flex">{name}</CardTitle>
-                  <CardDescription>
-                    From{" "}
-                    {Intl.NumberFormat("en-US", {
-                      style: "currency",
-                      currency: pricing.priceRangeUndiscounted.start.currency,
-                    }).format(
-                      pricing.priceRangeUndiscounted.start.gross.amount
-                    )}
-                  </CardDescription>
-                </Card>
-              </Link>
-            );
-          })}
-        </div>
+        {data.products.edges.length ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {data.products.edges.map((product) => {
+              const { id, name, thumbnail, pricing } = product.node;
+              if (!thumbnail?.url) return;
+              return (
+                <Link key={id} href={`/${id}`}>
+                  <Card className="p-4">
+                    <div className="flex justify-center items-center mb-2">
+                      <Image
+                        width={100}
+                        height={100}
+                        src={thumbnail?.url ?? ""}
+                        alt={thumbnail?.alt ?? ""}
+                      />
+                    </div>
+                    <CardTitle className="text-sm flex">{name}</CardTitle>
+                    <CardDescription>
+                      From{" "}
+                      {Intl.NumberFormat("en-US", {
+                        style: "currency",
+                        currency: pricing.priceRangeUndiscounted.start.currency,
+                      }).format(
+                        pricing.priceRangeUndiscounted.start.gross.amount
+                      )}
+                    </CardDescription>
+                  </Card>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <>
+            <div className="text-2xl font-semibold text-center mt-4">
+              {`No products found for ${debouncedSearch}`}
+            </div>
+          </>
+        )}
         <div className="flex justify-center w-full space-x-2">
           <Button
             disabled={!data.products.pageInfo.hasPreviousPage}

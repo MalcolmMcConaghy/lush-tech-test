@@ -24,7 +24,7 @@ export default async function Product({ params }: { params: { id: string } }) {
 
   return (
     <div className="lg:flex lg:p-4 xl:max-w-5xl xl:m-auto">
-      <div className="lg:w-3/4 mx-auto">
+      <div className="lg:w-1/4 mx-auto">
         <Carousel>
           {media.map((image, i) => {
             return (
@@ -40,7 +40,7 @@ export default async function Product({ params }: { params: { id: string } }) {
           })}
         </Carousel>
       </div>
-      <div className="p-4 lg:p-0 lg:pl-4 mb-[75px] xl:mb-0">
+      <div className="p-4 lg:p-0 lg:pl-4 mb-[75px] xl:mb-0 lg:w-3/4">
         <div className="flex flex-col space-y-2">
           <div className="text-2xl font-semibold">{name}</div>
           <div className="flex space-x-4 items-center">
