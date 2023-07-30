@@ -56,7 +56,7 @@ export default function Home() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-6 max-w-[800px] m-auto">
-      <div className="flex flex-col space-y-4 items-center">
+      <div className="flex flex-col space-y-4 items-center min-w-full sm:min-w-[400px] md:min-w-[750px]">
         <div className="text-2xl font-semibold">Products</div>
         <Input
           type="text"
@@ -65,7 +65,7 @@ export default function Home() {
           onChange={(e) => setSearch(e.target.value)}
         />
         {data.products.edges.length ? (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full">
             {data.products.edges.map((product) => {
               const { id, name, thumbnail, pricing } = product.node;
               if (!thumbnail?.url) return;
